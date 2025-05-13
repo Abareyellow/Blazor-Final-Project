@@ -1,0 +1,44 @@
+﻿@page "/"
+
+@using EventEase.Models
+
+<PageTitle>Home</PageTitle>
+
+<h1>Browse Events</h1>
+
+@foreach (var ev in Events)
+{
+    <EventCard EventId="@ev.EventId"
+               EventName="@ev.EventName"
+               EventDate="@ev.EventDate"
+               Location="@ev.Location" />
+    <div>
+        <label>
+            <input type="checkbox" @bind="ev.IsRegistered" /> Registered
+        </label>
+    </div>
+}
+
+<button @onclick="AddMockEvent">Add Mock Event</button>
+
+@code {
+    private List<EventModel> Events = new()
+    {
+        new EventModel { EventId = 1, EventName = "Tech Conference", EventDate = DateTime.Now.AddDays(10), Location = "New York", IsRegistered = false },
+        new EventModel { EventId = 2, EventName = "Music Festival", EventDate = DateTime.Now.AddDays(20), Location = "Los Angeles", IsRegistered = true },
+        new EventModel { EventId = 3, EventName = "Art Expo", EventDate = DateTime.Now.AddDays(30), Location = "Chicago", IsRegistered = false }
+    };
+
+    private void AddMockEvent()
+    {
+        var nextId = Events.Count + 1;
+        Events.Add(new EventModel
+        {
+            EventId = nextId,
+            EventName = $"Sample Event {nextId}",
+            EventDate = DateTime.Now.AddDays(5 * nextId),
+            Location = "Sample City",
+            IsRegistered = false
+        });
+    }
+}

@@ -1,0 +1,27 @@
+@* EventCard.razor *@
+
+<div class="event-card">
+    <h3>@EventName</h3>
+    <p><strong>Date:</strong> @EventDate.ToString("MMMM dd, yyyy")</p>
+    <p><strong>Location:</strong> @Location</p>
+    <a class="btn btn-link" href="/eventdetails/@EventId">View Details</a>
+    <a class="btn btn-link" href="/register/@EventId">Register</a>
+    <a class="btn btn-link" href="/">Back to Events</a>
+</div>
+
+@code {
+    [Parameter]
+    public string? EventName { get; set; }
+
+    [Parameter]
+    public DateTime EventDate { get; set; }
+
+    [Parameter]
+    public string? Location { get; set; }
+
+    [Parameter]
+    public int EventId { get; set; }
+
+    [Inject]
+    private NavigationManager? Navigation { get; set; }
+}
