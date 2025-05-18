@@ -1,0 +1,54 @@
+@using EventEase.Models
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<EditForm Model="registrationModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label>Name</label>
+        <InputText class="form-control" @bind-Value="registrationModel.Name" />
+        <ValidationMessage For="@(() => registrationModel.Name)" />
+    </div>
+    <div class="mb-3">
+        <label>Email</label>
+        <InputText class="form-control" @bind-Value="registrationModel.Email" />
+        <ValidationMessage For="@(() => registrationModel.Email)" />
+    </div>
+    <button type="submit" class="btn btn-success">Register</button>
+</EditForm>
+
+@if (isRegistered)
+{
+    <div class="alert alert-success mt-3">
+        Registration successful! Welcome, @registrationModel.Name.
+    </div>
+}
+
+@code {
+    [Parameter]
+    public EventModel Event { get; set; } = default!;
+
+    private RegistrationModel registrationModel = new();
+    private bool isRegistered = false;
+
+    private void HandleValidSubmit()
+    {
+        if (!Event.Attendees.Contains(registrationModel.Name))
+        {
+            Event.Attendees.Add(registrationModel.Name);
+        }
+        isRegistered = true;
+        // Optionally, store user session info here
+    }
+
+    public class RegistrationModel
+    {
+        [Required(ErrorMessage = "Name is required")]
+        public string Name { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
+        public string Email { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,30 @@
+@using EventEase.Models
+
+<div class="attendance-form">
+    <EditForm Model="this" OnValidSubmit="AddAttendee">
+        <InputText @bind-Value="attendeeName" placeholder="Your Name" class="form-control mb-2" />
+        <button type="submit" class="btn btn-success">Add Attendee</button>
+    </EditForm>
+    <ul>
+        @foreach (var name in Event.Attendees)
+        {
+            <li>@name</li>
+        }
+    </ul>
+</div>
+
+@code {
+    [Parameter]
+    public EventModel Event { get; set; } = default!;
+
+    private string attendeeName = string.Empty;
+
+    private void AddAttendee()
+    {
+        if (!string.IsNullOrWhiteSpace(attendeeName))
+        {
+            Event.Attendees.Add(attendeeName);
+            attendeeName = string.Empty;
+        }
+    }
+}

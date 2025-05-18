@@ -1,44 +1,121 @@
 ﻿@page "/"
 
 @using EventEase.Models
+@using EventEase.Pages
 
 <PageTitle>Home</PageTitle>
 
-<h1>Browse Events</h1>
+<div>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link @(activeTab == "events" ? "active" : "")" href="#" @onclick='@(() => SetTab("events"))'>Events</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(activeTab == "attendance" ? "active" : "")" href="#" @onclick='@(() => SetTab("attendance"))'>Attendance Tracker</a>
+        </li>
+    </ul>
 
-@foreach (var ev in Events)
-{
-    <EventCard EventId="@ev.EventId"
-               EventName="@ev.EventName"
-               EventDate="@ev.EventDate"
-               Location="@ev.Location" />
-    <div>
-        <label>
-            <input type="checkbox" @bind="ev.IsRegistered" /> Registered
-        </label>
+    <div class="tab-content mt-3">
+        @if (activeTab == "events")
+        {
+            <h2>Add New Event</h2>
+            <EditForm Model="newEvent" OnValidSubmit="AddEvent">
+                <InputText @bind-Value="newEvent.EventName" placeholder="Event Name" class="form-control mb-2" />
+                <InputDate @bind-Value="newEvent.EventDate" class="form-control mb-2" />
+                <InputText @bind-Value="newEvent.Location" placeholder="Location" class="form-control mb-2" />
+                <button type="submit" class="btn btn-primary">Add Event</button>
+            </EditForm>
+
+            <h1>Browse Events</h1>
+            @foreach (var ev in Events)
+            {
+                <EventCard EventId="@ev.EventId"
+                           EventName="@ev.EventName"
+                           EventDate="@ev.EventDate"
+                           Location="@ev.Location"
+                           OnRegisterClicked="() => ShowRegisterForm(ev.EventId)" />
+                @if (showRegisterFormFor == ev.EventId)
+                {
+                    <RegistrationForm Event="ev" />
+                }
+            }
+        }
+        else if (activeTab == "attendance")
+        {
+            <h2>Attendance Tracker</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Attendees</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ev in Events)
+                    {
+                        <tr>
+                            <td>@ev.EventName</td>
+                            <td>@ev.EventDate.ToString("MMMM dd, yyyy")</td>
+                            <td>@ev.Location</td>
+                            <td>
+                                @if (ev.Attendees.Count == 0)
+                                {
+                                    <span>No attendees yet</span>
+                                }
+                                else
+                                {
+                                    <ul>
+                                        @foreach (var attendee in ev.Attendees)
+                                        {
+                                            <li>@attendee</li>
+                                        }
+                                    </ul>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
     </div>
-}
-
-<button @onclick="AddMockEvent">Add Mock Event</button>
+</div>
 
 @code {
+    private string activeTab = "events";
+    private void SetTab(string tab)
+    {
+        activeTab = tab;
+    }
+
     private List<EventModel> Events = new()
     {
-        new EventModel { EventId = 1, EventName = "Tech Conference", EventDate = DateTime.Now.AddDays(10), Location = "New York", IsRegistered = false },
-        new EventModel { EventId = 2, EventName = "Music Festival", EventDate = DateTime.Now.AddDays(20), Location = "Los Angeles", IsRegistered = true },
-        new EventModel { EventId = 3, EventName = "Art Expo", EventDate = DateTime.Now.AddDays(30), Location = "Chicago", IsRegistered = false }
+        new EventModel { EventId = 1, EventName = "Tech Conference", EventDate = DateTime.Now.AddDays(10), Location = "New York", Attendees = new List<string>() },
+        new EventModel { EventId = 2, EventName = "Music Festival", EventDate = DateTime.Now.AddDays(20), Location = "Los Angeles", Attendees = new List<string>() },
+        new EventModel { EventId = 3, EventName = "Art Expo", EventDate = DateTime.Now.AddDays(30), Location = "Chicago", Attendees = new List<string>() }
     };
 
-    private void AddMockEvent()
+    private EventModel newEvent = new EventModel { EventDate = DateTime.Now, Attendees = new List<string>() };
+
+    private int? showRegisterFormFor = null;
+
+    private void ShowRegisterForm(int eventId)
     {
-        var nextId = Events.Count + 1;
+        showRegisterFormFor = showRegisterFormFor == eventId ? null : eventId;
+    }
+
+    private void AddEvent()
+    {
+        newEvent.EventId = Events.Count > 0 ? Events.Max(e => e.EventId) + 1 : 1;
         Events.Add(new EventModel
         {
-            EventId = nextId,
-            EventName = $"Sample Event {nextId}",
-            EventDate = DateTime.Now.AddDays(5 * nextId),
-            Location = "Sample City",
-            IsRegistered = false
+            EventId = newEvent.EventId,
+            EventName = newEvent.EventName,
+            EventDate = newEvent.EventDate,
+            Location = newEvent.Location,
+            Attendees = new List<string>()
         });
+        newEvent = new EventModel { EventDate = DateTime.Now, Attendees = new List<string>() };
     }
 }

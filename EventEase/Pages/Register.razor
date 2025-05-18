@@ -1,0 +1,49 @@
+@page "/register/{EventId:int}"
+@using EventEase.Models
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private EventModel? Event;
+
+    protected override void OnInitialized()
+    {
+        // Mock data for demonstration
+        var mockEvents = new List<EventModel>
+        {
+            new EventModel { EventId = 1, EventName = "Tech Conference", EventDate = DateTime.Now.AddDays(10), Location = "New York" },
+            new EventModel { EventId = 2, EventName = "Music Festival", EventDate = DateTime.Now.AddDays(20), Location = "Los Angeles" },
+            new EventModel { EventId = 3, EventName = "Art Expo", EventDate = DateTime.Now.AddDays(30), Location = "Chicago" }
+        };
+        Event = mockEvents.FirstOrDefault(e => e.EventId == EventId);
+    }
+
+    private bool IsRegistered = false;
+    private void RegisterEvent()
+    {
+        IsRegistered = true;
+    }
+}
+
+@if (Event != null)
+{
+    <div class="register-event">
+        <h2>Register for @Event.EventName</h2>
+        <p><strong>Date:</strong> @Event.EventDate.ToString("MMMM dd, yyyy")</p>
+        <p><strong>Location:</strong> @Event.Location</p>
+        @if (!IsRegistered)
+        {
+            <button @onclick="RegisterEvent">Register</button>
+        }
+        else
+        {
+            <p>You are registered for this event!</p>
+        }
+        <a href="/">Back to Events</a>
+    </div>
+}
+else
+{
+    <p>Event not found.</p>
+}

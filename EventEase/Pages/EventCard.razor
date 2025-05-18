@@ -5,7 +5,7 @@
     <p><strong>Date:</strong> @EventDate.ToString("MMMM dd, yyyy")</p>
     <p><strong>Location:</strong> @Location</p>
     <a class="btn btn-link" href="/eventdetails/@EventId">View Details</a>
-    <a class="btn btn-link" href="/register/@EventId">Register</a>
+    <button class="btn btn-link" @onclick="OnRegisterClicked">Register</button>
     <a class="btn btn-link" href="/">Back to Events</a>
 </div>
 
@@ -21,6 +21,9 @@
 
     [Parameter]
     public int EventId { get; set; }
+
+    [Parameter]
+    public EventCallback OnRegisterClicked { get; set; }
 
     [Inject]
     private NavigationManager? Navigation { get; set; }

@@ -7,4 +7,5 @@ public class EventModel
     public DateTime EventDate { get; set; }
     public string Location { get; set; } = string.Empty;
     public bool IsRegistered { get; set; }
+    public List<string> Attendees { get; set; } = new();
 }
